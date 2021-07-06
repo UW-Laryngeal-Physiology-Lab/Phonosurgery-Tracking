@@ -8,7 +8,7 @@ This folder contains files for running the Video Based Phonomicrosurgery Instrum
 
 2) Developer Documentation : Contains documentation related to the mechanical setup of the Simulated Surgery Station and the electrical and network setup of the camera rig.
 
-3) Installers : Contains installer for Huffyuv codec.  Videos using the system are encoded using Huffyuv which is a lossless codec.  Additionally, contains an installer for Basler Pylon.  This is the SDK for the cameras used in the camera rig.  This needs to be installed on the PC communicating with the cameras.
+3) Installers : Contains installer for Huffyuv codec.  Videos using the system are encoded using Huffyuv which is a lossless codec.  Basler Pylon also needs to be installed. Unfortunately, I can only add a link here since it it too big of a file for GitHub.
 
 4) Matlab : Contains all Matlab routines used by V-PITS to process video data.  Primarily this is related to instrument tracking and 3D trajectory estimation.
 
