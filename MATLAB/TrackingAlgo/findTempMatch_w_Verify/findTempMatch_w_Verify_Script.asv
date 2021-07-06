@@ -1,0 +1,72 @@
+% findTempMatch_w_Verify_Script.m
+%% User Parameters
+% Noise
+noiseSigma = 3;
+
+% Template Size
+wSize = 79;
+
+% Search Window
+nMultip = 2;
+
+
+% Gaussian ~ 80 pixels wide
+sigmaX = 40/2; sigmaY = 40/2;
+nRows = 500; nCols = 500;
+X0 = round((nCols-1)/2); Y0 = round((nRows-1)/2);
+
+% Template & Neighborhood Search Window
+wSize = 79; 
+
+%% Initialize Template
+% Generate Initialization Image
+gIm = uint8(noiseSigma*randn(nRows,nCols)) + ...
+    gaussian2dIm(X0,Y0,sigmaX,sigmaY,nRows,nCols);
+
+% Initialize Template
+[tPos,tSize,pc] = initWeightedTemplate(gIm,79);
+
+% Define Neighborhood Search Window
+nSize = 2*tSize + 1;
+nCorn = tPos - ((nSize-1)/2 - (tSize-1)/2);
+
+%% Run Test
+shiftMax = floor(0.9 * ((nSize-1)/2 - (tSize-1)/2));
+shift = -shiftMax:5.5:shiftMax;
+matchScore = zeros(numel(shift).^2,1);
+fitMSE = zeros(numel(shift).^2,1);
+errorSig = zeros(numel(shift).^2,2);
+
+count = 0;
+for xShift = shift
+    disp(xShift);
+    for yShift = shift;
+        count = count + 1;
+        
+        % Generate Shifted Gaussian Image
+        gIm = uint8(noiseSigma*randn(nRows,nCols)) + ...
+            gaussian2dIm(X0 + xShift,Y0 + yShift,sigmaX,sigmaY,...
+                          nRows,nCols);
+                      
+        % Perform Weighted Template Matching & Compute Estimated
+        % Displacement
+        [estPos,~,score,fMSE] = findTempMatch_w(gIm,pc,nCorn,nSize);
+        estDisp = estPos - tPos;
+        
+        % Computet Error in Displacement Estimate
+        errorSig(count,:) = estDisp - [xShift,yShift];
+        matchScore(count) = score;
+        fitMSE(count) = fMSE;
+    end
+end
+
+%% Display Results
+figure();
+subplot(2,1,1); plot(errorSig(:,1)); title('X Error');
+subplot(2,1,2); plot(errorSig(:,2)); title('Y Error');
+
+figure();
+subplot(2,1,1); plot(matchScore); title('Match Score');
+subplot(2,1,2); plot(fitMSE); title('Fit MSE');
+
+
